@@ -1,0 +1,180 @@
+pipeline {
+    agent any
+    
+    parameters {
+        string(name: 'DOCKER_TAG', defaultValue: 'latest', description: 'Parameterized Docker Image Tag')
+    }
+    
+    tools {
+        jdk 'jdk17'
+        maven 'maven3'
+    }
+    
+    environment {
+        SCANNER_HOME= tool 'sonar-scanner'
+    }
+
+    stages {
+        
+        stage('Clear Workspace') {
+            steps {
+                cleanWs()      // Clear Workspace before running pipeline
+            }
+        }
+        
+        stage('Git Checkout') {
+            steps {
+                git branch: 'main', credentialsId: 'git-cred', url: 'https://github.com/Godfrey22152/Multi-Tier-GitOps-Project.git'
+            }
+        }
+        
+        stage('Code Compile') {
+            steps {
+                sh "mvn compile"
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                sh "mvn clean test"
+            }
+        }
+        
+        stage('Trivy FS scan') {
+            steps {
+                sh "trivy fs --format json -o fs_result.json ."
+            }
+        }
+        
+        stage('Sonarqube Analysis') {
+            steps {
+                withSonarQubeEnv('sonar-server') {
+                sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Bank-App -Dsonar.projectKey=Bank-App \
+                       -Dsonar.java.binaries=target -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml'''
+                }
+                
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                sh "mvn package"
+            }
+        }
+        
+        stage('Publish Artifacts') {
+            steps {
+                withMaven(globalMavenSettingsConfig: 'maven-settings', jdk: 'jdk17', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
+                    sh "mvn deploy"
+                }
+            }
+        } 
+        
+        stage('Docker Build and Tag') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker build -t godfrey22152/bankapp:${params.DOCKER_TAG} ."
+                    }
+                }
+            }
+        }
+        
+        stage('Docker Image scan by Trivy') {
+            steps {
+                sh "trivy image --format json -o image_scan_result.json godfrey22152/bankapp:${params.DOCKER_TAG}"
+            }
+        }
+        
+        stage('Publish Docker Image to Dockerhub') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker push godfrey22152/bankapp:${params.DOCKER_TAG}"
+                    }
+                }
+            }
+        }
+        
+         stage('Update Docker Tag in the Deployment manifest file in manifest branch') {
+            steps {
+                script {
+                    withCredentials([gitUsernamePassword(credentialsId: 'git-cred', gitToolName: 'Default')]) {
+                        sh '''
+                            # Git Clone Repository
+                            git clone -b manifest --single-branch https://github.com/Godfrey22152/Multi-Tier-GitOps-Project.git Manifest_files 
+                            cd Manifest_files
+                            git checkout manifest
+                            
+                            # List files to confirm the presence of bankapp-deployment.yaml file in the Manifest_Files folder.
+                            ls -l 
+
+                            # Get the absolute path for the current directory
+                            repo_dir=$(pwd)
+                            
+                            # Use the absolute path for sed
+                            sed -i "s|image: godfrey22152/bankapp:.*|image: godfrey22152/bankapp:${DOCKER_TAG}|" "${repo_dir}/bankapp-deployment.yaml"
+                        '''
+                        
+                        // Confirm the change
+                        sh '''
+                            echo "Updated YAML Manifest file Content:"
+                            cat Manifest_files/bankapp-deployment.yaml
+
+                        '''
+                        
+                        // Configure Git for committing changes and pushing
+                        sh '''
+                            cd Manifest_files   #Ensure you are inside the cloned repo. 
+                            git config user.email "godfreyifeanyi45@gmail.com"
+                            git config user.name "Godfrey22152"
+                        '''
+                        
+                        // Commit and push Updated YAML file back to the repository
+                        sh '''
+                            cd Manifest_files
+                            ls
+                            git add bankapp-deployment.yaml
+                            git commit -m "Updated image tag to ${DOCKER_TAG} by Jenkins"
+                            git push origin manifest
+                        '''
+                    }
+                }
+            }
+        } 
+    } 
+    // Email Notification Code Block
+    post {
+    always {
+        script {
+            def jobName = env.JOB_NAME
+            def buildNumber = env.BUILD_NUMBER
+            def pipelineStatus = (currentBuild?.result != null) ? currentBuild.result : 'SUCCESS'
+            def bannerColor = pipelineStatus.toUpperCase() == 'SUCCESS' ? 'green' : 'red'
+            
+            def body = """
+                <html>
+                <body>
+                <div style="border: 4px solid ${bannerColor}; padding: 10px;">
+                <h2>${jobName} - Build ${buildNumber}</h2>
+                <div style="background-color: ${bannerColor}; padding: 10px;">
+                <h3 style="color: white;">Pipeline Status: ${pipelineStatus.toUpperCase()}</h3>
+                </div>
+                <p>Check the <a href="{BUILD_URL}">console output</a>.</p>
+                </div>
+                </body>
+                </html>
+            """
+            
+            emailext (
+                subject: "Jenkins Build Notification: ${jobName} - Build ${buildNumber} - ${pipelineStatus.toUpperCase()}",
+                body: body,
+                from: 'jenkins@example.com',
+                to: 'godfreyifeanyi45@gmail.com',
+                replyTo: 'jenkins@example.com',
+                mimeType: 'text/html',
+            )
+        }
+    }
+    }
+}
