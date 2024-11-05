@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  bankapp:
+    build: .
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/bankappdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=Test@123
+    depends_on:
+      mysql:
+        condition: service_healthy  # Wait for MySQL to be healthy
+    networks:
+      - bank-net
+    restart: on-failure  # restart policy
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: Test@123
+      MYSQL_DATABASE: bankappdb
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./src/main/resources/static/mysql:/docker-entrypoint-initdb.d
+    networks:
+      - bank-net
+    ports:
+      - "3306:3306"
+    healthcheck:  
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  mysql-data:
+
+networks:
+  bank-net:
