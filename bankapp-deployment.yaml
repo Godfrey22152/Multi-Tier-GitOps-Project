@@ -74,6 +74,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: bankapp
+  annotations:
+    prometheus.io/scrape: "true"             # Tells Prometheus to scrape this service
+    prometheus.io/path: "/actuator/prometheus" # The endpoint for Prometheus metrics
+    prometheus.io/port: "8080"               # The port where metrics are exposed (on the service)
 spec:
   selector:
     app: bankapp
