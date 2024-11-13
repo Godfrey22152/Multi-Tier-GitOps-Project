@@ -7,7 +7,7 @@ This guide will walk you through setting up the Jenkins pipeline from scratch, i
 
 ## Prerequisites
 
-- **Jenkins Server**: - The EC2 server setup running Jenkins, with Java, Docker, and Trivy installed and accessible over the browser. **See [Infra-Setup](./Infra-Setup) for guidance** 
+- **Jenkins Server**: - The EC2 server setup running Jenkins, with Java, Docker, and Trivy installed and accessible over the browser. **See [Infra-Setup](../Infra-Setup) for guidance** 
 - **Docker**: Docker installed on the Jenkins server for building and pushing images.
 - **Java**: JDK 17 is required to compile and run your Java application.
 - **Maven**: Required for dependency management and building the application.
@@ -255,7 +255,7 @@ You are expected to generate google app passwords for the GMAIL Email Notificati
 ### 2. Configure the Pipeline Script 
 1. In the pipeline configuration page, scroll to **Discard old builds**, select the number of **Days to keep builds**, also enter the `2` or any number you like for the **Max # of builds to keep**.
 2. In the pipeline configuration page, scroll to the **Pipeline** section.
-3. Choose **Pipeline script** and enter the Jenkinsfile script in the **[Jenkinsfile](./Jenkins-CI/Jenkinsfile)** in the folder.
+3. Choose **Pipeline script** and enter the Jenkinsfile script in the **[Jenkinsfile](./Jenkinsfile)** in the folder.
 
 
 ### 3. Pipeline Stages and Explanation
