@@ -262,14 +262,14 @@ aws eks --region eu-west-1 update-kubeconfig --name odo-eks-cluster
 
 #### Installation Steps
 
-1. **Create a Namespace for ArgoCD**
+1. **Create a Namespace for ArgoCD**:
 To organize ArgoCD resources, first create a dedicated namespace:
 
 ```bash
  kubectl create namespace argocd
 ```
 
-2. **Install ArgoCD**
+2. **Install ArgoCD**:
 Apply the ArgoCD installation manifests to install it within the argocd namespace:
 
 ```bash
@@ -277,7 +277,7 @@ Apply the ArgoCD installation manifests to install it within the argocd namespac
 ```
 This command will deploy all necessary components for ArgoCD, including the API server, repository server, controller, and application controller.
 
-3. **Verify Installation**
+3. **Verify Installation**:
 Check the status of the ArgoCD pods and services to ensure they are running as expected:
 
 ```bash
@@ -285,7 +285,7 @@ Check the status of the ArgoCD pods and services to ensure they are running as e
  kubectl get services -n argocd
 ```
 
-4. **Expose the ArgoCD Server**
+4. **Expose the ArgoCD Server**:
 To access the ArgoCD web interface externally, change the argocd-server service type from ClusterIP to LoadBalancer. This will provision a cloud-assigned public IP:
 
 ```bash 
