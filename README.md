@@ -9,7 +9,7 @@ This guide provides a detailed walkthrough for the `CD` setup and management usi
 
 1. **AWS CLI**: Installed and configured with access to the EKS cluster.
 2. **kubectl**: Installed and configured to access the cluster.
-**NOTE**: Kindly visit the **[Infra-Setup](https://github.com/Godfrey22152/Multi-Tier-GitOps-Project/blob/main/Infra-Setup/README.md)** folder in the `main branch` for a detailed guide on how to setup the EKS Cluster using `Terraform` and install `AWS CLI` and `kubectl`.
+- **NOTE**: Kindly visit the **[Infra-Setup](https://github.com/Godfrey22152/Multi-Tier-GitOps-Project/blob/main/Infra-Setup/README.md)** folder in the `main branch` for a detailed guide on how to setup the EKS Cluster using `Terraform` and install `AWS CLI` and `kubectl`.
 
 ---
 
@@ -105,10 +105,10 @@ kubectl get nodes
 
 2. **Use the UI to Add the Application**:
    - Go to **Applications** > **New App** and fill out the form:
-     - **Application Name**: `bankapp`
-     - **Project Name**: `default`
-     - **Sync Policy**: Automated
-     - **Sync Options**:
+     - **APPLICATION NAME**: `bankapp`
+     - **PROJECT NAME**: `default`
+     - **SYNC POLICY**: Automated
+     - **SYNC OPTIONS**:
        - **Skip Schema Validation**: Tick the box 
        - **Auto-Create Namespace**: Tick the box 
      - **SOURCE**:
@@ -119,7 +119,7 @@ kubectl get nodes
        - **Cluster**: `https://kubernetes.default.svc`
        - **Namespace**: `webapps`
      - **DIRECTORY**:
-       - **DIRECTORY RECURSE**: Tick the box.
+       - **Directory Recurse**: Tick the box.
    
 
 3. **Save and Sync**:
@@ -131,8 +131,8 @@ kubectl get nodes
    - On the application dashboard:
      - Verify that the **Sync Status** is `Synced` and the **Health Status** is `Healthy`.
    - Locate the **Resources** section, which lists all the Kubernetes objects created by the application.
-     - Click on the **Service** resource (in our case, `bankapp-service`) to open its details.
-     - Look for the `LOADBALANCER-URL` under the **HOSTNAMES** section.
+     - Click on the **Service** resource (in our case, `bankapp-svc`) to open its details.
+     - Look for the `<LOADBALANCER-URL>` under the **HOSTNAMES** section.
    - Open a browser and navigate to `http://<LOADBALANCER-URL>` to access the application.
      
 ---
@@ -207,6 +207,7 @@ This image shows the health status of the deployed application (`bankapp`) in Ar
 
 ## Conclusion
 
-We have successfully set up ArgoCD to manage the `CD` deployments on the EKS cluster. Hence, with GitOps and ArgoCD, we can ensure automated, reliable, and secure application delivery. Moving on, kindly visit the **[Monitoring](https://github.com/Godfrey22152/Multi-Tier-GitOps-Project/blob/main/Monitoring/README.md)** folder in the `main` branch for a detailed guide on how to setup the `Monitoring tools` to monitor the application performance.
+We have successfully set up ArgoCD to manage the `CD` deployments on the EKS cluster. Hence, with GitOps and ArgoCD, we can ensure automated, reliable, and secure application delivery. 
+- Moving on, kindly visit the **[Monitoring](https://github.com/Godfrey22152/Multi-Tier-GitOps-Project/blob/main/Monitoring/README.md)** folder in the `main` branch for a detailed guide on how to setup the `Monitoring tools` to monitor the application performance.
 
 ---
