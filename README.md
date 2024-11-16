@@ -88,7 +88,7 @@ kubectl get nodes
    - Click **Connect Repo** and provide:
      - **Choose your connection method**: `VIA HTTPS`
      - **Repository URL**: `https://github.com/Godfrey22152/Multi-Tier-GitOps-Project.git`
-     - **Authentication**: If required, provide SSH keys or username/password.
+     - **Authentication**: Provide repository Username and Personal Access Token (PAT).
 
 2. **Example UI Screenshot**:  
    Below is an example of the **Connect Repo** form in ArgoCD:
