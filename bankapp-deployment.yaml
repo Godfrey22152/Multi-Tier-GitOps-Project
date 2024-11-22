@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: bankapp
-          image: godfrey22152/bankapp:latest
+          image: godfrey22152/bankapp:latestss
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
