@@ -61,11 +61,11 @@ Here's a brief explanation of each property and why it's needed:
 - 4. `management.metrics.enable.custom=true`: Ensures that custom metrics (such as those annotated with @Timed in your code) are enabled. This allows Prometheus to collect your specific application-level metrics in addition to default system and JVM metrics.
 
 ### 5. Verify the Prometheus Metrics
-When the `BankApp` application is run navigate to the `/actuator/prometheus` endpoint (e.g., `http://<APP-EXTERNAL-IP>:<PORT>/actuator/prometheus`) to confirm that the metrics are being exposed. You should see metrics such as `bankapp_dashboard_seconds_count`, `bankapp_dashboard_seconds_sum`, and others.
+When the `BankApp` application is deployed, navigate to the `/actuator/prometheus` endpoint (e.g., `http://<APP-EXTERNAL-IP>:<PORT>/actuator/prometheus`) to confirm that the metrics are being exposed. You should see metrics such as `bankapp_dashboard_seconds_count`, `bankapp_dashboard_seconds_sum`, and others.
 
-- **Prometheus Targets**
-  ![Prometheus Targets](images/prometheus_actuator.png)
-  *This image shows the Prometheus targets that have been successfully discovered, including the BankApp application metrics endpoint. It confirms that Prometheus is actively scraping metrics from the application for monitoring and alerting.*
+- **Prometheus Endpoint Metrics**
+  ![Prometheus Endpoint Metrics](images/prometheus_cluster_metrics.png)
+  *This image shows the Prometheus endpoint metrics including BankApp application metrics endpoint in the `/actuator/prometheus` metrics_path. This exposes the metrics to Prometheus for scraping.*
 
 ---
 
@@ -268,7 +268,7 @@ metadata:
     prometheus.io/port: "8080"                 # Defines the port where Prometheus can access the metrics endpoint.
 ```
 2. **Prometheus Configuration**: 
-The Prometheus server is set up to discover services in the Kubernetes cluster by default thanks to installation using Helm chart. Prometheus uses Kubernetes API service discovery to find all services with the annotation prometheus.io/scrape: "true" in the cluster. 
+The Prometheus server is set up to discover services in the Kubernetes cluster by default thanks to installation using Helm chart. Prometheus uses Kubernetes API service discovery to find all services with the annotation `prometheus.io/scrape: "true"` in the cluster. 
 The relevant configuration for Prometheus typically looks like this in the Prometheus config map: 
 
 ```bash
@@ -330,7 +330,14 @@ kindly see the **[mysql-deployment.yaml](https://github.com/Godfrey22152/Multi-T
 ```bash
 kubectl get pods -n webapps
 ```
-You should see a pod named something like `mysql-exporter-prometheus-mysql-exporter-<release-name>.`
+You should see a pod named like `mysql-exporter-prometheus-mysql-exporter-<release-name>` as shown sample below:
+```bash
+NAME                                                        READY   STATUS    RESTARTS  AGE
+bankapp-66bf9774f-mb5vm                                     1/1     Running   0         25h
+bankapp-66bf9774f-ptwmf                                     1/1     Running   0         25h
+mysql-d6ff9ccb5-zf9c7                                       1/1     Running   0         25h
+mysql-exporter-prometheus-mysql-exporter-7897f67f59-lkbtk   1/1     Running   0         25h
+```
 
 4. Add Scrape Config to Prometheus:
 Configure Prometheus to scrape the mysql exporter which indirect scrapes the mysql metrics. Edit the `prometheus-server` configmap in the `monitoring` namespace to include the scrape configuration for the MySQL exporter:
@@ -369,10 +376,26 @@ To verify that Prometheus is collecting metrics from the `MySQL exporter` and th
    - Look for the `BankApp` and `MySQL exporter` endpoints in the list of targets. Ensure their status is **UP**, indicating Prometheus is successfully scraping metrics.
 
 3. Query the Metrics:
-   - In the Prometheus **Graph** tab, enter queries like `bankapp_dashboard_seconds_count` or any other metrics exposed by the application or the exporter (e.g., `mysql_global_status_connections` for MySQL metrics).
+   - In the Prometheus **Graph** tab, enter queries like `bankapp_dashboard_seconds_count` or other metrics exposed by the application or the exporter (e.g., `mysql_global_status_connections` for MySQL metrics).
    - Click **Execute** to view real-time data or visualize it as a graph.
 
-Setting up service discovery ensures Prometheus can dynamically monitor these endpoints, making it easier to track application performance and respond to issues promptly.
+3. Query the Metrics:
+   - In the Prometheus **Graph** tab, enter queries like `bankapp_dashboard_seconds_count` or other metrics exposed by the application or the exporter (e.g., `mysql_global_status_connections` for MySQL metrics).
+   - Click **Execute** to view real-time data or visualize it as a graph.
+
+   **Tweaking The Queries:**
+   - To fine-tune your queries and extract the most relevant data, start with basic metric names and gradually apply filters. For example, you can add labels to focus on specific endpoints, methods, or status codes.
+     - Example: `http_server_requests_seconds_count{namespace="webapps", method="GET"}` to track only GET requests in the "webapps" namespace.
+   - Use the **rate()** function for time-based data to calculate the rate of change over a specific period. For example, `rate(bankapp_dashboard_seconds_count[5m])` can help track the average number of requests over 5 minutes.
+   - To monitor MySQL, use metrics provided by the MySQL exporter. For instance, `mysql_global_status_connections` shows the number of active database connections. You can tweak this by applying filters like `mysql_global_status_connections{status="active"}` to track only active connections.
+   - Explore **aggregation functions** like `sum()`, `avg()`, and `max()` to calculate totals, averages, or peak values. For example, `sum(rate(bankapp_dashboard_seconds_sum[5m]))` aggregates the total time spent on the dashboard in the last 5 minutes.
+   - Use **alerting queries** to proactively track specific conditions. For example, setting a threshold for response times or error rates can help catch potential issues early.
+
+   Experiment with different queries in the `Prometheus UI` to get a sense of the data patterns. Once comfortable, you can use these queries in setting Alerts and Grafana dashboards for better visualization and monitoring.
+
+   **For More Advanced Queries:**
+   - For a detailed guidance on writing effective PromQL queries, refer to the [Prometheus Querying Documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/) for an in-depth understanding of the functions, operators, and techniques available.
+
 
 ---
 ### Image Section: Metrics Query Examples
@@ -380,6 +403,10 @@ Below are examples of metrics queries and their results in Prometheus:
 
 - **Prometheus Service Discovery:**
   ![Prometheus Service Discovery](images/bankapp_service_discovery.png)
+
+- **Prometheus Targets**
+  ![Prometheus Service Discovery](images/prometheus_actuator.png)
+  *This image shows the Prometheus targets that have been successfully discovered, including the BankApp application metrics endpoint. It confirms that Prometheus is actively scraping metrics from the application for monitoring and alerting.*
 
 - **BankApp Application:**
   ![Bankapp Application](images/Bankapp.png)
@@ -409,4 +436,3 @@ Below are examples of metrics queries and their results in Prometheus:
 
 - **kindly visit the [AlertManager](./Alertmanager-setup) Setup folder for a detailed guide on how the `Alert Manager`was setup and application monitored**.
 - **kindly visit the [Grafana](./Grafana-setup) Setup folder for a detailed guide on how the `Grafana` was setup and how application metrics was visiualized in dashboards and application monitored through `Grafana Alerts`**.
-
