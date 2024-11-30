@@ -534,10 +534,26 @@ SEE **[Monitoring Folder in Main Branch](./Monitoring)**: Monitoring setup with 
 ## Pipeline Setup
 The Jenkins pipeline includes stages for compiling, file system scans, testing, static code analysis, building, image scanning, updating docker-tag, and Email notification of the builds. To set up the pipeline, follow these basic steps:
 
-   - **Ensure the following plugins are installed and configured:**
-   In Jenkins navigate to `Dashboard` > `Manage Jenkins` > `Plugins` > `available plugins` search and install: `Docker`, `Eclipse Temurin installer`, `SonarQube Scanner`, `Config File Provider`, `Maven Integration`, `Pipeline Maven Integration`, `Kubernetes`, `Kubernetes Credentials`, `Kubernetes CLI`, `Kubernetes Client API`, `Pipeline: Stage View`
+### Prerequisites
 
-   - **Clone the repository and navigate to the `Jenkins-CI` folder.**
-- For details on setting up the Jenkins pipeline, refer to the `README.md` file in the **[Jenkins-CI](./Jenkins-CI)** folder. 
+#### **1. Install and Configure the Required Jenkins Plugins**
 
+To set up the Jenkins environment, ensure the following plugins are installed and configured:
 
+1. Navigate to `Dashboard` > `Manage Jenkins` > `Plugins` > `Available Plugins`.  
+2. Search for and install the following plugins:
+   - **Docker**
+   - **Eclipse Temurin installer**
+   - **SonarQube Scanner**
+   - **Config File Provider**
+   - **Maven Integration**
+   - **Pipeline Maven Integration**
+   - **Pipeline: Stage View**
+
+#### **2. Clone the Repository**
+
+- Clone the repository and navigate to the `Jenkins-CI` directory.
+
+#### **3. Jenkins Pipeline Setup**
+
+- For details on setting up the Jenkins pipeline, refer to the `README.md` file in the **[Jenkins-CI](../Jenkins-CI)** directory.
