@@ -1,6 +1,6 @@
 # Setting Up Custom Monitoring Metrics for BankApp Using Prometheus, Alertmanager, and Grafana
 
-This guide walks you through the steps to set up the custom monitoring metrics for the `BankApp` application using Prometheus, Alertmanager, and Grafana. Before proceeding with the setup, ensure the necessary prerequisites are implemented in the application code.
+This guide walks you through the steps to set up the custom monitoring metrics for the `BankApp` application using `Prometheus`, `Alertmanager`, and `Grafana`. Before proceeding with the setup, ensure the necessary prerequisites are implemented in the application code.
 
 ## Prerequisites
 
@@ -41,7 +41,7 @@ public String dashboard(Model model) {
 This creates a Prometheus metric named `bankapp_dashboard` with timing data for the `dashboard` method. This was also repeated for other critical methods which was used to to monitor performance, such as `registerAccount`, `deposit`, `withdraw`, and more.
 
 ### 3. Create a Metrics Configuration Class
-To enable the use of the `@Timed` annotation and configure Prometheus metrics, I created a configuration class. take a look at the **[src/main/java/com/example/bankapp/MetricsConfig.java](https://github.com/Godfrey22152/Multi-Tier-GitOps-Project/blob/main/src/main/java/com/example/bankapp/MetricsConfig.java)** class:
+To enable the use of the `@Timed` annotation and configure Prometheus metrics, I created a configuration class. take a look at the **[src/main/java/com/example/bankapp/MetricsConfig.java](https://github.com/Godfrey22152/Multi-Tier-GitOps-Project/blob/main/src/main/java/com/example/bankapp/MetricsConfig.java)** class.
 
 ### 4. Enable Prometheus Endpoint
 In the **[application.properties](https://github.com/Godfrey22152/Multi-Tier-GitOps-Project/blob/main/src/main/resources/application.properties)** file, I enabled the Prometheus metrics endpoint. This is typically part of the Spring Boot Actuator. This configuration ensures that the Spring Boot application exposes metrics in a format that Prometheus can scrape and use. 
@@ -62,6 +62,10 @@ Here's a brief explanation of each property and why it's needed:
 
 ### 5. Verify the Prometheus Metrics
 When the `BankApp` application is run navigate to the `/actuator/prometheus` endpoint (e.g., `http://<APP-EXTERNAL-IP>:<PORT>/actuator/prometheus`) to confirm that the metrics are being exposed. You should see metrics such as `bankapp_dashboard_seconds_count`, `bankapp_dashboard_seconds_sum`, and others.
+
+- **Prometheus Targets**
+  ![Prometheus Targets](images/prometheus_actuator.png)
+  *This image shows the Prometheus targets that have been successfully discovered, including the BankApp application metrics endpoint. It confirms that Prometheus is actively scraping metrics from the application for monitoring and alerting.*
 
 ---
 
@@ -376,10 +380,6 @@ Below are examples of metrics queries and their results in Prometheus:
 
 - **Prometheus Service Discovery:**
   ![Prometheus Service Discovery](images/bankapp_service_discovery.png)
-
-- **Prometheus Targets**
-  ![Prometheus Service Discovery](images/prometheus_actuator.png)
-  *This image shows the Prometheus targets that have been successfully discovered, including the BankApp application metrics endpoint. It confirms that Prometheus is actively scraping metrics from the application for monitoring and alerting.*
 
 - **BankApp Application:**
   ![Bankapp Application](images/Bankapp.png)
