@@ -16,9 +16,9 @@ The BankApp Infrastructure Setup `Infra-Setup` folder contains the deployment pi
 
 ## Features
 
-- **[Jenkins-CI Folder in Main Branch](./Jenkins-CI)**: CI pipeline setup with Jenkins.
+- **[Jenkins-CI Directory](./Jenkins-CI)**: CI pipeline setup with Jenkins.
 - **[Manifest Branch](https://github.com/Godfrey22152/Multi-Tier-GitOps-Project/tree/manifest)**: CD setup using ArgoCD.
-- **[Monitoring Folder in Main Branch](./Monitoring)**: Monitoring setup with Prometheus and Grafana.
+- **[Monitoring Directory](../Monitoring)**: Monitoring setup with `Prometheus`, `Alertmanager` and `Grafana`.
 
 
 ---
@@ -56,6 +56,7 @@ Before setting up the **Multi-Tier-GitOps-Project Infrastructure**, ensure you h
 
 ### Monitoring Tools: 
 - **Prometheus**: Collects and manages metrics for the infrastructure and application.
+- **AlertManager**: Handles alerts sent by Prometheus servers.
 - **Grafana**: Visualizes metrics and system health from Prometheus.
 
 
@@ -332,7 +333,7 @@ ArgoCD offers several configurations to optimize and secure your CD pipeline:
 
 
 ---
-### Helm Configuration for Amazon EKS Cluster with Prometheus Deployment
+### Helm Configuration for Amazon EKS Cluster with `Prometheus`, `Alertmanager`, and `Grafana` Deployments
 This guide walks through configuring Helm on your EKS cluster and deploying Prometheus to monitor the application and cluster resources. Helm is a package manager for Kubernetes, making it easier to install, configure, and manage Kubernetes applications.
 
 #### Prerequisites
@@ -351,44 +352,47 @@ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scrip
 chmod 700 get_helm.sh
 ./get_helm.sh
 ```
-
-2. Verify Helm Installation:
+Verify Helm Installation in the `EKS cluster`:
 
 ```bash
 helm version
 ```
-You should see Helm’s version details if installed correctly.
+You should see Helm’s version details if installed correctly if not installed kindly install it.
 
 #### Configuring Helm for Amazon EKS
 Helm requires access to the Kubernetes API server to manage resources within your EKS cluster.
 
 1. Set up RBAC for Helm (Helm 3):
 
-In Amazon EKS, you may need to set up permissions if your user doesn’t have full cluster access by default. Run the following commands to create a ServiceAccount and RoleBinding for Helm:
+In Amazon EKS, you may need to set up permissions if your user doesn’t have full cluster access by default. Run the following commands to create a `ServiceAccount` and `RoleBinding` for Helm:
 
 ```bash
 kubectl create serviceaccount helm -n kube-system
 kubectl create clusterrolebinding helm --clusterrole cluster-admin --serviceaccount=kube-system:helm
 ```
 
-2. Add Helm Repository for Prometheus:
+---
+#### Installation of Monitoring Tools
 
-Add the stable repository (includes Prometheus) to Helm:
+##### Installing Prometheus and Alertmanager to the EKS Cluster
+After you configure Helm for your Amazon EKS cluster, you can use it to deploy Prometheus with the following steps.
+
+1. Add Helm Repository for Prometheus:
+
+Add the stable repository (includes Prometheus and Alertmanager) to Helm:
+
 ```bash
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 ```
 
-#### Deploying Prometheus to the EKS Cluster
-After you configure Helm for your Amazon EKS cluster, you can use it to deploy Prometheus with the following steps.
-
-1. Create a Namespace for Prometheus:
+2. Create a Namespace for the Monitoring setup:
 
 ```bash
 kubectl create namespace monitoring
 ```
-2. Deploy Prometheus.
-Install the prometheus into the monitoring namespace:
+3. Install Prometheus:
+Install the prometheus into the `monitoring` namespace:
 
 ```bash
 helm upgrade -i prometheus prometheus-community/prometheus \
@@ -396,7 +400,7 @@ helm upgrade -i prometheus prometheus-community/prometheus \
     --set alertmanager.persistence.storageClass="gp2" \
     --set server.persistentVolume.storageClass="gp2"
 ```
-> This command will deploy Prometheus, Alertmanager, and Grafana along with Kubernetes service monitors and alerting rules.
+> This command will install Prometheus, Alertmanager, prometheus-kube-state-metrics, prometheus-node-exporter, etc in the monitoring namespace.
 
 3. Verify that all of the Pods in the `monitoring` namespace are in the READY state.
 ```bash
@@ -406,14 +410,13 @@ kubectl get pods -n monitoring
 An example output is as follows.
 
 ```bash 
-NAME                                             READY   STATUS    RESTARTS   AGE
-prometheus-alertmanager-59b4c8c744-r7bgp         1/2     Running   0          48s
-prometheus-kube-state-metrics-7cfd87cf99-jkz2f   1/1     Running   0          48s
-prometheus-node-exporter-jcjqz                   1/1     Running   0          48s
-prometheus-node-exporter-jxv2h                   1/1     Running   0          48s
-prometheus-node-exporter-vbdks                   1/1     Running   0          48s
-prometheus-pushgateway-76c444b68c-82tnw          1/1     Running   0          48s
-prometheus-server-775957f748-mmht9               1/2     Running   0          48s
+NAME                                                         READY   STATUS    RESTARTS   AGE
+prometheus-alertmanager-0                                    1/1     Running   0          48s
+prometheus-kube-state-metrics-5ff55bc4f-fjsph                1/1     Running   0          48s
+prometheus-prometheus-node-exporter-dcrjd                    1/1     Running   0          48s
+prometheus-prometheus-node-exporter-kbbwn                    1/1     Running   0          48s
+prometheus-prometheus-pushgateway-85b7d9fbfc-snk5m           1/1     Running   0          48s
+prometheus-server-756669d577-gkfgl                           2/2     Running   0          48s
 ```
 > **NOTE**:
 If running your cluster on a local environment without a dynamic volume provisioning, you may wish to install `OpenEBS` through `helm` before installing `Prometheus`:
@@ -431,34 +434,100 @@ helm upgrade -i prometheus prometheus-community/prometheus \
    --set server.persistentVolume.storageClass="openebs-hostpath"
 ```
 
-#### Accessing the Prometheus UI
-To access Prometheus, expose the prometheus-kube-prometheus-prometheus service as a LoadBalancer.
+##### Installing Grafana:
+
+1. Add the Helm repository:
+```bash
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+```
+
+2. Install Grafana:
+```bash
+helm install grafana grafana/grafana --namespace monitoring 
+```
+
+3. Verify the Installation:
+```bash
+kubectl get pods -n monitoring
+```
+Ensure the Grafana pod is in the `Running` state.
+
+---
+
+##### Accessing the Prometheus, Alertmanager, and  Grafana UI
+By default, Prometheus, Alertmanager, and Grafana will be exposed via a ClusterIP service. To expose it as a `LoadBalancer`, use the following commands:
 
 1. Patch the Service:
 
 ```bash
-kubectl patch svc prometheus-server -n monitoring -p '{"spec": {"type": "LoadBalancer"}}'
+kubectl patch service prometheus-server -n monitoring -p '{"spec": {"type": "LoadBalancer"}}'
 ```
-
-2. Get the External IP:
-
-After a few moments, retrieve the external IP assigned to Prometheus by running:
-```bash
-kubectl get svc -n monitoring prometheus-server
-```
-
-Once you have the external IP, you can access Prometheus in your browser at:
 
 ```bash
-http://<external-ip>:9090
+kubectl patch service prometheus-alertmanager -n monitoring -p '{"spec": {"type": "LoadBalancer"}}'
 ```
-
->**NOTE**:
-For local clusters (e.g., Minikube), use port-forwarding instead:
 
 ```bash
-kubectl --namespace monitoring port-forward svc/prometheus-server 9090:80
+kubectl patch service grafana -n monitoring -p '{"spec": {"type": "LoadBalancer"}}'
 ```
+
+2. Get the External IP or DNS Name of the LoadBalancer:
+
+After a few moments, retrieve the external IP assigned to Prometheus, Alertmanager, and  Grafana by running:
+```bash
+kubectl get service -n monitoring prometheus-server
+kubectl get service -n monitoring prometheus-alertmanager
+kubectl get service -n monitoring grafana
+```
+
+Check the `EXTERNAL-IP` column. Get the IP or DNS name assigned by the Load Balancer. Once you have the external IP, you can access Prometheus, prometheus-alertmanager, and grafana in your browser at:
+
+```bash
+http://<EXTERNAL-IP>:9090   # or http://<DNS-NAME>:9090
+http://<EXTERNAL-IP>:9093   # or http://<DNS-NAME>:9093
+http://<EXTERNAL-IP>:3000   # or http://<DNS-NAME>:3000
+```
+
+3. Get Grafana `admin` user password by running:
+
+```bash
+kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+```
+
+>##### NOTE:
+For local clusters (e.g., kubeadm or Minikube clusters), use port-forwarding or convert the service to `NodePort` instead:
+
+- 1. **port-forwarding**
+
+```bash
+kubectl port-forward svc/prometheus-server 9090:80 --namespace monitoring
+kubectl port-forward svc/prometheus-alertmanager 9093:9093 --namespace monitoring
+kubectl port-forward svc/grafana 3000:80 --namespace monitoring
+```
+- 2. **To Use NodePort**
+
+```bash
+kubectl patch service prometheus-server -n monitoring -p '{"spec": {"type": "NodePort"}}'
+```
+
+```bash
+kubectl patch service prometheus-alertmanager -n monitoring -p '{"spec": {"type": "NodePort"}}'
+```
+
+```bash
+kubectl patch service grafana -n monitoring -p '{"spec": {"type": "NodePort"}}'
+```
+
+Get the `Instance IP` and the port assigned by `NodePort` which will appear as (e.g for prometheus: `9090:31750`, alertmanager: `9093:31918` and grafana:`3000:31994`) and access Prometheus, prometheus-alertmanager, and grafana in your browser at:
+
+```bash
+# FOR EXAMPLE
+http://<INSTANCE-IP>:31750   
+http://<INSTANCE-IP>:31918   
+http://<INSTANCE-IP>:31994 
+```
+
 SEE **[Monitoring Folder in Main Branch](./Monitoring)**: Monitoring setup with Prometheus and Grafana for further guidance on completing the setup.
 
 ---
