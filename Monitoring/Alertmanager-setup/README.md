@@ -20,18 +20,19 @@ Prometheus configuration is stored in the Kubernetes cluster ConfigMap. To ident
 
 1. List all ConfigMaps in the `monitoring` namespace:
 
-   ```bash
-   kubectl get configmap -n monitoring
-  ```
+ ```bash
+ kubectl get configmap -n monitoring
+ ```
+
 2. Identify the ConfigMap associated with the Prometheus server `prometheus-server`: 
 
-  ```bash
+ ```bash
   NAME                      DATA   AGE
   grafana                   1      45m
   kube-root-ca.crt          1      51m
   prometheus-alertmanager   1      50m
   prometheus-server         6      50m
-  ```
+ ```
 
 #### Step 2: Write Prometheus Alerting Rules
 1. Create a separate YAML file, e.g `prometheus_server_cm-alert_rules.yaml` and add the alert rules as shown below: 
@@ -225,11 +226,11 @@ Prometheus configuration is stored in the Kubernetes cluster ConfigMap. To ident
 
  ```
 
-
 2. **Why Create Rules in a Separate File?**
   - Simplifies maintenance and prevents accidental overwrites in the ConfigMap.
   - Makes debugging and testing of new rules more straightforward.
-  
+
+---
 #### Step 3: Add Alerting Rules to the Prometheus ConfigMap
 Use `kubectl patch` to inject the alerting rules into the Prometheus server ConfigMap:
 
@@ -243,6 +244,7 @@ kubectl patch configmap prometheus-server -n monitoring --patch "$(cat prometheu
 kubectl get configmap prometheus-server -n monitoring -o yaml
 ```
 
+---
 #### Step 4: Verify the Alerting Rules
 
 1. **Access the Prometheus UI**  
@@ -269,9 +271,10 @@ We will define the notification system (the receivers and routing) that will ens
 
 1. List ConfigMaps in the `monitoring` namespace:
 
-   ```bash
-   kubectl get configmap -n monitoring
+  ```bash
+  kubectl get configmap -n monitoring
   ```
+
 2. Identify the `prometheus-alertmanager` ConfigMap.:
   ```bash
   NAME                      DATA   AGE
@@ -343,7 +346,7 @@ Create a YAML file, e.g., `prometheus-alertmanager_cm_notification.yaml`, with t
  ```
 
 ---
-> ##### Setting Up Gmail `auth_password` and Retrieving Slack `api_url`
+##### **NOTE: Setting Up Gmail `auth_password` and Retrieving Slack `api_url`**
 
 ###### Setting Up Gmail `auth_password` for SMTP Authentication
 The `auth_password` field is crucial for authenticating your Gmail account to send email alerts through Alertmanager. Follow these steps to set it up securely:
@@ -492,8 +495,9 @@ curl -X POST http://<PROMETHEUS-ALERTMANAGER-EXTERNAL-IP>:9093/-/reload
           
        - **Notification Confirmation:**  
          ![Notification Confirmation](../images/notification_confirmation_slack.png)  
-         *The image shows a notification confirmation in Slack, highlighting both Firing and Resolved alerts for the `openebs` pod in `CrashLoopBackOff` state.* 
-         *The **Firing Notification** alerts the team about the ongoing issue, while the **Resolved Notification** confirms that the issue has been addressed, ensuring effective incident management and tracking.*
+         - *The image shows a notification confirmation in Slack, highlighting both Firing and Resolved alerts for the `openebs` pod in `CrashLoopBackOff` state.* 
+         - *The **Firing Notification** alerts the team about the ongoing issue, while the **Resolved Notification** confirms that the issue has been addressed, ensuring 
+            effective incident management and tracking.*
 
 
 ---
@@ -502,7 +506,7 @@ curl -X POST http://<PROMETHEUS-ALERTMANAGER-EXTERNAL-IP>:9093/-/reload
 ##### **Scenario**
 In this test, we simulate a situation where a Prometheus alert is triggered for both the `MySQLInstanceDown` and `BankappInstanceDown` alerts. The inhibition rule is configured to suppress the `BankappInstanceDown` alert when the `MySQLInstanceDown` alert is active. This prevents redundant alerts caused by cascading failures, allowing the focus to remain on the root cause. 
 
-###### **Steps to Simulate the Scenario**
+###### Steps to Simulate the Scenario
 
 1. **Stop the Dependent MySQL Pod**  
 Scale down the `mysql` deployment to zero replicas, which will stop `mysql-d6ff9ccb5-zf9c7` pod, which the `Bankapp` pods depends on:
@@ -511,7 +515,7 @@ Scale down the `mysql` deployment to zero replicas, which will stop `mysql-d6ff9
    ```
    **This action will trigger the `MySQLInstanceDown` alert in Prometheus.**
 
-   > **To scale back the deployment once testing is complete, you can scale it back up like this**:
+   - **To scale back the deployment once testing is complete, you can scale it back up like this**:
 
      ```bash
      kubectl scale deployment mysql --replicas=1 -n webapps
@@ -553,7 +557,7 @@ Check the notification channels (email or Slack) to ensure:
 
 ---
 
-## 3. kindly visit the [Grafana](./Grafana-setup) Setup folder for a detailed guide on how the `Grafana` was setup and how application metrics was visiualized in dashboards and application monitored through `Grafana Alerts`**.
+## 3. kindly visit the [Grafana Setup](./Grafana-setup) folder for a detailed guide on how the `Grafana` was setup and how application metrics was visiualized in dashboards and application monitored through `Grafana Alerts`.
 
 ---
 
