@@ -410,6 +410,7 @@ Below are examples of metrics queries and their results in Prometheus:
 
 - **BankApp Application:**
   ![Bankapp Application](images/Bankapp.png)
+   ![Bankapp Application](images/Bankapp_2.png)
   *Interact and Transact with the app so that Prometheus can scrape the application metrics*
 
 - **BankApp Metrics Samples:**
