@@ -37,7 +37,194 @@ Prometheus configuration is stored in the Kubernetes cluster ConfigMap. To ident
 1. Create a separate YAML file, e.g `prometheus_server_cm-alert_rules.yaml` and add the alert rules as shown below: 
 
  ```bash
+ data:
+   alerting_rules.yml: |
+     groups:
+       # Detect when MySQL database instance is down
+       - name: mysql_alert_rule
+         rules:
+           - alert: MySQLInstanceDown
+             expr: mysql_up{job="mysql-exporter"} == 0
+             for: 5m
+             labels:
+               severity: critical
+               team: infra-team
+             annotations:
+               summary: "MySQL Instance is down. BankApp may also be affected."
+               description: |
+                 The MySQL database Instance with the label `{{ $labels.instance }}` for job `{{ $labels.job }}` 
+                 has been down for more than 5 seconds. 
+
+       - name: Bankapp-alert-rules
+         rules:
+           # Detect when the BankApp application instance is down
+           - alert: BankappInstanceDown
+             expr: up{service="bankapp"} == 0
+             for: 5s
+             labels:
+               severity: critical
+               team: infra-team
+             annotations:
+               summary: "The Bankapp Application Instance Down ({{ $labels.instance }})"
+               description: "The Bankapp Application Instance {{ $labels.instance }} is down for more than 5 seconds."
+
+           # Tracks the total time taken to load the Bankapp dashboard.
+           - alert: HighDashboardLoadTime
+             expr: rate(bankapp_dashboard_seconds_sum[5m]) > 10
+             for: 2m
+             labels:
+               severity: warning
+               team: infra-team
+             annotations:
+               summary: "High latency detected on the dashboard"
+               description: "The dashboard is experiencing high latency for the last 5 minutes. Average latency: {{ $value }} seconds."
+
+           # Track Percentage Change in Withdrawal Activity.
+           - alert: WithdrawalRateChange
+             expr: |
+               ((rate(bankapp_withdraw_seconds_sum[5m]) - rate(bankapp_withdraw_seconds_sum[10m]))
+               / rate(bankapp_withdraw_seconds_sum[10m]) * 100) > 50
+             for: 5m
+             labels:
+               severity: warning
+               team: infra-team
+             annotations:
+               summary: "Significant Increase in Withdrawal Activity Detected"
+               description: |
+                 The withdrawal rate for the bankapp application has increased by {{ $value }}%
+                 in the last 5 minutes compared to the previous 10 minutes.
+                 This exceeds the defined threshold of 50% and could indicate abnormal activity
+                 or system issues.
+               action: |
+                 - Investigate recent withdrawal trends in the application logs.
+                 - Check for potential anomalies such as unexpected spikes in user activity.
+                 - Verify the database and backend services for performance issues.
+
+           # Track Average Time Spent on Transfers
+           - alert: HighTransferLatency
+             expr: rate(bankapp_transferAmount_seconds_sum[5m]) / rate(bankapp_transferAmount_seconds_count[5m]) > 10
+             for: 2m
+             labels:
+               severity: warning
+               team: infra-team
+             annotations:
+               summary: "High transfer latency detected"
+               description: "The average latency for transfers exceeds {{ $value }} seconds."
+
+           # Track Total Time Spent on Withdrawals
+           - alert: WithdrawalLoadSpike
+             expr: increase(bankapp_withdraw_seconds_sum[5m]) > 50
+             for: 2m
+             labels:
+               severity: warning
+               team: infra-team
+             annotations:
+               summary: "High withdrawal load detected"
+               description: "Total time spent processing withdrawals exceeds 50 seconds in the last 5 minutes."
+
+           # Track the Time Taken to Complete a Deposit
+           - alert: HighDepositLatency
+             expr: |
+               histogram_quantile(0.95, rate(bankapp_deposit_seconds_bucket[5m])) > 5
+             for: 2m
+             labels:
+               severity: warning
+               team: infra-team
+             annotations:
+               summary: "High Deposit Latency Detected"
+               description: |
+                 The 95th percentile latency for deposit operations in the bankapp application
+                 has exceeded 5 seconds over the past 5 minutes. This could indicate performance
+                 degradation in the system.
+               action: |
+                 - Investigate the bankapp application and database performance.
+                 - Check for bottlenecks in the backend service or infrastructure.
+                 - Monitor the transaction throughput for any potential correlation.
+
+           # Track Deposit Activity
+           - alert: SuddenChangeInDepositRate
+             expr: |
+               ((rate(bankapp_deposit_seconds_sum[4w]) - rate(bankapp_deposit_seconds_sum[8w]))
+               / rate(bankapp_deposit_seconds_sum[8w]) * 100) < -50
+             for: 4w
+             labels:
+               severity: warning
+               team: infra-team
+             annotations:
+               summary: "Significant Change in Deposit Activity Detected"
+               description: |
+                 The deposit rate for the bankapp application has dropped by {{ $value }}%
+                 in the last 4 weeks compared to the previous 8 weeks. This could indicate
+                 abnormal activity or system issues.
+
+           # Detect when cluster node instance is down
+           - alert: ClusterNodeInstanceDown
+             expr: up{job="kubernetes-nodes"} == 0
+             for: 2m
+             labels:
+               severity: critical
+               team: devops
+             annotations:
+               summary: "Cluster Node Instance Down ({{ $labels.instance }})"
+               description: "Cluster Node Instance {{ $labels.instance }} is down for more than 2 minutes."
+
+           # Monitor memory usage percentage on Kubernetes nodes
+           - alert: NodeMemoryUsageHigh
+             expr: 100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > 80
+             for: 10m
+             labels:
+               severity: critical
+               team: devops
+             annotations:
+               summary: "High Memory Usage ({{ $labels.instance }})"
+               description: "Node {{ $labels.instance }} memory usage is above 80% for more than 10 minutes."
+
+           # Detect when containers are experiencing CPU throttling
+           - alert: CPULimitsThrottlingHigh
+             expr: rate(container_cpu_cfs_throttled_seconds_total[5m]) / rate(container_cpu_cfs_periods_total[5m]) > 0.2
+             for: 5m
+             labels:
+               severity: warning
+               team: devops
+             annotations:
+               summary: "High CPU Throttling Detected"
+               description: "Container {{ $labels.container }} in namespace {{ $labels.namespace }} is experiencing high CPU throttling."
+
+           # Monitor when disk space usage exceeds a threshold
+           - alert: DiskSpaceLow
+             expr: 100 - (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 > 90
+             for: 10m
+             labels:
+               severity: critical
+               team: devops
+             annotations:
+               summary: "Low Disk Space ({{ $labels.instance }})"
+               description: "Instance {{ $labels.instance }} has less than 10% free disk space remaining."
+
+           # Detect pods in a CrashLoopBackOff state
+           - alert: PodCrashLoopBackOff
+             expr: kube_pod_container_status_restarts_total > 150
+             for: 5m
+             labels:
+               severity: critical
+               team: devops
+             annotations:
+               summary: "Pod in CrashLoopBackOff ({{ $labels.pod }})"
+               description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is restarting frequently."
+
+           # Monitor for unusually high API server request loads
+           - alert: HighAPIServerRequests
+             expr: rate(apiserver_request_total[5m]) > 500
+             for: 5m
+             labels:
+               severity: warning
+               team: devops
+             annotations:
+               summary: "High API Server Requests"
+               description: "API server is receiving more than 500 requests per second."
+
  ```
+
 
 2. **Why Create Rules in a Separate File?**
   - Simplifies maintenance and prevents accidental overwrites in the ConfigMap.
@@ -147,7 +334,7 @@ Create a YAML file, e.g., `prometheus-alertmanager_cm_notification.yaml`, with t
 
        - name: "on-call-team"
          slack_configs:
-           - api_url: "https://hooks.slack.com/services/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"    # Webhook URL of Slack
+           - api_url: "https://hooks.slack.com/services/TXXXX/BXXXX/XXXXXXXXXX"                              # Webhook URL of Slack
              channel: "#devops-projects"                                                                     # Specify the Slack Channel or User
              send_resolved: true
              text: |
@@ -196,7 +383,7 @@ Slack notifications in Alertmanager are sent via a **Webhook URL (`api_url`)**. 
    - Once generated, copy the Webhook URL, which looks like this:
 
      ```
-     https://hooks.slack.com/services/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S0L1SXPGf
+     https://hooks.slack.com/services/TXXXX/BXXXX/XXXXXXXXXX
      ```
 
 4. **Test the Webhook Integration**
