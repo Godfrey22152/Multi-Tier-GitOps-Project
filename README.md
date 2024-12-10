@@ -11,6 +11,9 @@
 - [References](#references)
 
 ## Overview
+ 
+## **Multi-Tier-GitOps-Project workflow - `Bankapp` Application**  
+   ![Multi-Tier-GitOps-Project workflow](images/GitOps-Page-main.drawio.png)
 
 The **Multi-Tier-GitOps-Project** is a comprehensive GitOps-based CI/CD pipeline designed for deploying the **Bankapp** application in a Kubernetes cluster. This project integrates a secure, multi-stage deployment pipeline that encompasses:
 - Continuous Integration (CI) via Jenkins, focusing on security and quality checks.
