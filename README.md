@@ -19,7 +19,9 @@ The **Multi-Tier-GitOps-Project** is a comprehensive GitOps-based CI/CD pipeline
 
 Each stage integrates security and quality checks, allowing the deployment pipeline to automatically respond to changes, detect potential vulnerabilities, and provide feedback on code quality. This guide outlines each stage and directs users to specific README files for detailed setup instructions.
 
-## Features
+
+---
+## **Features**
 
 ### Continuous Integration (CI)
 1. **Security Scanning**:
@@ -135,6 +137,7 @@ The Grafana setup in this project enables powerful visualization and monitoring 
 This Grafana setup enhances observability, enabling teams to maintain high performance and reliability for both the application and the underlying infrastructure.
 
 
+---
 ## Prerequisites
 
 Before setting up the Multi-Tier-GitOps-Project, you need a good knowledge of the following and have them installed in your cluster:
@@ -145,6 +148,8 @@ Before setting up the Multi-Tier-GitOps-Project, you need a good knowledge of th
 - A Docker Hub account or private Docker registry for image storage.
 - [SonarQube](https://www.sonarqube.org/) and [Nexus](https://www.sonatype.com/products/repository-oss) instances.
 
+
+---
 ## Technologies Used
 
 - **Kubernetes**: Orchestrates the containerized deployment of the Bankapp application.
@@ -156,6 +161,8 @@ Before setting up the Multi-Tier-GitOps-Project, you need a good knowledge of th
 - **SonarQube**: Analyzes code for quality, security vulnerabilities, and test coverage.
 - **Nexus**: Stores and manages build artifacts.
 
+
+---
 ## Infrastructure Setup
 
 Each phase of this project has its own setup instructions. Please refer to the following folders in the repository for detailed setup guides:
@@ -165,6 +172,8 @@ Each phase of this project has its own setup instructions. Please refer to the f
 3. **[Manifest Branch](https://github.com/Godfrey22152/Multi-Tier-GitOps-Project/tree/manifest)**: CD setup using ArgoCD.
 4. **[Monitoring Folder in Main Branch](./Monitoring)**: Monitoring setup with Prometheus and Grafana.
 
+
+---
 ## Screenshots
 
 ### The Bankapp Application
