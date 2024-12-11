@@ -557,7 +557,7 @@ Check the notification channels (email or Slack) to ensure:
 
 ---
 
-## 3. kindly visit the [Grafana Setup](./Grafana-setup) folder for a detailed guide on how the `Grafana` was setup and how application metrics was visiualized in dashboards and application monitored through `Grafana Alerts`.
+## 3. kindly visit the [Grafana Setup](../Grafana-setup) folder for a detailed guide on how the `Grafana` was setup and how application metrics was visiualized in dashboards and application monitored through `Grafana Alerts`.
 
 ---
 
