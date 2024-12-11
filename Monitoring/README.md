@@ -379,10 +379,6 @@ To verify that Prometheus is collecting metrics from the `MySQL exporter` and th
    - In the Prometheus **Graph** tab, enter queries like `bankapp_dashboard_seconds_count` or other metrics exposed by the application or the exporter (e.g., `mysql_global_status_connections` for MySQL metrics).
    - Click **Execute** to view real-time data or visualize it as a graph.
 
-3. Query the Metrics:
-   - In the Prometheus **Graph** tab, enter queries like `bankapp_dashboard_seconds_count` or other metrics exposed by the application or the exporter (e.g., `mysql_global_status_connections` for MySQL metrics).
-   - Click **Execute** to view real-time data or visualize it as a graph.
-
    **Tweaking The Queries:**
    - To fine-tune your queries and extract the most relevant data, start with basic metric names and gradually apply filters. For example, you can add labels to focus on specific endpoints, methods, or status codes.
      - Example: `http_server_requests_seconds_count{namespace="webapps", method="GET"}` to track only GET requests in the "webapps" namespace.
