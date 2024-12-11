@@ -284,7 +284,7 @@ We will define the notification system (the receivers and routing) that will ens
   prometheus-server         6      50m
   ```
 
-#### Step 2: Write Prometheus Alerting Rules
+#### Step 2: Write Alertmanager Alerting Rules
 Create a YAML file, e.g., `prometheus-alertmanager_cm_notification.yaml`, with the following content:
 
  ```bash
