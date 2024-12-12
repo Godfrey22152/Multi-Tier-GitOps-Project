@@ -74,7 +74,7 @@ Grafana allows importing pre-configured dashboards to quickly visualize key metr
 | MySQL Overview                   | `7362`   | Provides insights into MySQL database metrics like queries, connections, and performance.         |
 | MySQL Exporter Quickstart        | `14057`  | A comprehensive MySQL exporter dashboard for monitoring database health and performance.          |
 | Node Exporter Full               | `1860`   | Detailed system metrics like CPU, memory, disk, and network from Node Exporter.                  |
-| JVM Overview                     | `15104`  | Java Virtual Machine (JVM) metrics including heap usage, garbage collection, and thread stats.    |
+| JVM Overview                     | `15104`  | Monitors JVM performance for **Bankapp**, tracking key metrics like heap usage, garbage collection, and thread performance. Integrates with Micrometer (Java, Spring Boot, Actuator) to expose Prometheus-compatible metrics for detailed monitoring of application health.    |
 
 ### Steps to Import Dashboards
 
