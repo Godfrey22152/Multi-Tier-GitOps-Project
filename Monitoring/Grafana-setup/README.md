@@ -179,6 +179,8 @@ To keep dashboards organized, group them into folders:
 > **Folder Structure Example**:
 - **Bankapp Metrics Dashboard**
   - JVM Overview
+  - Spring Boot 2.1 System Monitor
+  - SpringBoot APM Dashboard
 - **MySQL Database Dashboards**
   - MySQL Dashboard
   - MySQL Exporter Quickstart and Dashboard
@@ -200,19 +202,19 @@ To keep dashboards organized, group them into folders:
      ![JVM Overview Dashboard](../images/JVM2.png)
      ![JVM Overview Dashboard](../images/JVM3.png)
           
-### 2 SpringBoot APM Dashboard
+### 2. SpringBoot APM Dashboard
 
   - **SpringBoot APM Dashboard for detailed application performance monitoring (APM) for `Bankapp`**
      ![SpringBoot APM Dashboard](../images/APM.png)
      ![SpringBoot APM Dashboard](../images/APM2.png)
 
-### 3 Spring Boot 2.1 System Monitor Dashboard
+### 3. Spring Boot 2.1 System Monitor Dashboard
 
   - **Spring Boot 2.1 System Monitor tracks the `Bankapp` metrics**
      ![Spring Boot 2.1 System Monitor Dashboard](../images/system_monitor_dashboard.png)
      ![Spring Boot 2.1 System Monitor Dashboard](../images/system_monitor_dashboard2.png)
     
-### 4 MySQL Database Dashboards
+### 4. MySQL Database Dashboards
 
   - **MySQL Overview Dashboards for Monitoring the `MySQL` database Metrics**  
      ![MySQL Overview Dashboard](../images/MySQL.png)
