@@ -74,7 +74,10 @@ Grafana allows importing pre-configured dashboards to quickly visualize key metr
 | MySQL Overview                   | `7362`   | Provides insights into MySQL database metrics like queries, connections, and performance.         |
 | MySQL Exporter Quickstart        | `14057`  | A comprehensive MySQL exporter dashboard for monitoring database health and performance.          |
 | Node Exporter Full               | `1860`   | Detailed system metrics like CPU, memory, disk, and network from Node Exporter.                  |
-| JVM Overview                     | `15104`  | Monitors JVM performance for **Bankapp**, tracking key metrics like heap usage, garbage collection, and thread performance. Integrates with Micrometer (Java, Spring Boot, Actuator) to expose Prometheus-compatible metrics for detailed monitoring of application health.    |
+| JVM Overview                     | `15104`  | Monitors JVM performance for **Bankapp**, tracking key metrics like heap usage, garbage collection, and thread performance. Integrates with Micrometer (Java, Spring Boot, Actuator) to expose Prometheus-compatible metrics for detailed monitoring of application health. |
+| Spring Boot 2.1 System Monitor   | `11378`  | Tracks **Bankapp**'s Spring Boot 2.1 metrics, leveraging Micrometer to expose detailed application-level statistics, including memory usage, thread count, and active requests for performance tuning and monitoring. |
+| SpringBoot APM Dashboard         | `12900`  | Provides detailed application performance monitoring (APM) for **Bankapp**, with metrics on request processing times, error rates, and throughput, helping to identify bottlenecks and optimize the application's performance. |
+
 
 ### Steps to Import Dashboards
 
@@ -197,8 +200,19 @@ To keep dashboards organized, group them into folders:
      ![JVM Overview Dashboard](../images/JVM2.png)
      ![JVM Overview Dashboard](../images/JVM3.png)
           
+### 2 SpringBoot APM Dashboard
 
-### 2 MySQL Database Dashboards
+  - **SpringBoot APM Dashboard for detailed application performance monitoring (APM) for `Bankapp`**
+     ![SpringBoot APM Dashboard](../images/APM.png)
+     ![SpringBoot APM Dashboard](../images/APM2.png)
+
+### 3 Spring Boot 2.1 System Monitor Dashboard
+
+  - **Spring Boot 2.1 System Monitor tracks the `Bankapp` metrics**
+     ![Spring Boot 2.1 System Monitor Dashboard](../images/system_monitor_dashboard.png)
+     ![Spring Boot 2.1 System Monitor Dashboard](../images/system_monitor_dashboard2.png)
+    
+### 4 MySQL Database Dashboards
 
   - **MySQL Overview Dashboards for Monitoring the `MySQL` database Metrics**  
      ![MySQL Overview Dashboard](../images/MySQL.png)
@@ -209,8 +223,7 @@ To keep dashboards organized, group them into folders:
      ![MySQL Exporter Quickstart](../images/MySQL3.png)
      ![MySQL Exporter Quickstart](../images/MySQL4.png)
 
-
-### 3. Node Exporter Full Dashboard 
+### 5. Node Exporter Full Dashboard 
   
   - **Node Exporter Full Dashboard for Monitoring the entire cluster Metrics**  
      ![Node Exporter Full](../images/Node.png)
@@ -218,7 +231,7 @@ To keep dashboards organized, group them into folders:
      ![Node Exporter Full](../images/Node3.png)
 
 
-### 4. Custom Dashboard View
+### 6. Custom Dashboard View
 
   - **Custom Dashboard for Monitoring the Pods running in all Namespaces in the cluster**  
      ![custom Dashboard](../images/custom_dashboard.png)
