@@ -199,6 +199,7 @@ Each phase of this project has its own setup instructions. Please refer to the f
 - **Application Health Status**
   ![Application Health Status](images/application_health_status.png)
   ![Application Health Status](images/application_health_status_2.png)
+  ![Application Health Status](images/application_health_status_3.png)
   
 
 ### Prometheus Dashboard with Custom Metrics
