@@ -68,15 +68,26 @@ kubectl get nodes
    kubectl get svc -n argocd argocd-server
    ```
    Use the `<Loadbalancer-url>` to access the UI at `https://<argocd-Loadbalancer-url>`.
+   ```bash
+   NAME                                              TYPE           CLUSTER-IP       EXTERNAL-IP      PORT(S)                      AGE
+   service/argocd-applicationset-controller          ClusterIP      10.97.173.80     <none>           7000/TCP,8080/TCP            46mins
+   service/argocd-dex-server                         ClusterIP      10.97.166.35     <none>           5556/TCP,5557/TCP,5558/TCP   46mins
+   service/argocd-metrics                            ClusterIP      10.105.176.53    <none>           8082/TCP                     46mins
+   service/argocd-notifications-controller-metrics   ClusterIP      10.104.235.213   <none>           9001/TCP                     46mins
+   service/argocd-redis                              ClusterIP      10.110.2.116     <none>           6379/TCP                     46mins
+   service/argocd-repo-server                        ClusterIP      10.107.181.69    <none>           8081/TCP,8084/TCP            46mins
+   service/argocd-server                             LoadBalancer   10.97.203.200    192.168.56.100   80:31011/TCP,443:31460/TCP   46mins
+   service/argocd-server-metrics                     ClusterIP      10.99.59.119     <none>           8083/TCP                     46mins
+   ```
 
-2. **Retrieve Initial Admin Credentials**:
+3. **Retrieve Initial Admin Credentials**:
    ```bash
    kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d
    ```
    - **Username**: `admin`
    - **Password**: Output of the above command.
 
-3. **Change Admin Password**:
+4. **Change Admin Password**:
    - Navigate to **User Info** > **Update Password** in the ArgoCD UI to update the password.
 
 ---
@@ -94,6 +105,11 @@ kubectl get nodes
    Below is an example of the **Connect Repo** form in ArgoCD:
 
    ![Connect Repo Example](images/connect-repo-example.png)
+
+   **Connected Repository images:**
+   ![Connect Repo Example](images/connect-repo-example_2.png)
+   ![Connect Repo Example](images/connect-repo-example_3.png)
+   
 ---
 
 ## Step 5: Creating an Application in ArgoCD
@@ -197,12 +213,20 @@ spec:
 
 ## Application Deployment Visuals
 
+### Application Deployment in ArgoCD
+images of deployed `Bankapp` application deployed in ArgoCD UI
+![Application Deployment](images/application_health_status.png)
+![Application Deployment](images/deployed_application.png)
+
 ### Application Health in ArgoCD
-This image shows the health status of the deployed application (`bankapp`) in ArgoCD UI, as `Processing` while waiting for `Loadbalancer-url` to be assigned to the `bankapp` service. This confirms that all deployed resources are both **Synced** and **Healthy** .
+The Application health status of the deployed application (`bankapp`) in ArgoCD UI. This confirms that all deployed resources are both **Synced** and **Healthy** .
 
-![Application Health](images/application_health_status.png)
 ![Application Health](images/application_health_status_2.png)
+![Application Health](images/application_health_status_3.png)
+![Application Health](images/application_health_status_4.png)
 
+### ArgoCD Sync Status
+![Application Sync Status](images/argocd_sync_status.png)
 ---
 
 ## Conclusion
