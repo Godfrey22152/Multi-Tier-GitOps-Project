@@ -26,7 +26,7 @@ Each stage integrates security and quality checks, allowing the deployment pipel
 ---
 ## **Features**
 
-### Continuous Integration (CI)
+### [Continuous Integration-(CI)](https://github.com/Godfrey22152/Multi-Tier-GitOps-Project/tree/main/Jenkins-CI)
 1. **Security Scanning**:
    - Filesystem and Docker images are scanned for vulnerabilities using [Trivy](https://aquasecurity.github.io/trivy/).
    
