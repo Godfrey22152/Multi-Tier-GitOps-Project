@@ -52,7 +52,7 @@ kubectl get nodes
 4. **Expose ArgoCD Server**:
    - For public access:
      ```bash
-     kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": {"LoadBalancer"}}'
+     kubectl patch svc argocd-server -n argocd -p '{"spec":{"type":"LoadBalancer"}}'
      ```
    - For local clusters:
      ```bash
